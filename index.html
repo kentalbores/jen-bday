@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! 🎉</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000000;
+            overflow: auto;
+            position: relative;
+            margin-bottom: 15vh;
+        }
+        
+        #asciiOutput {
+            font-family: 'Courier New', monospace;
+            font-size: 4px;
+            line-height: 1;
+            letter-spacing: 0;
+            white-space: pre;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #asciiOutput span {
+            display: inline-block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #ffffff;
+            min-height: 200px;
+        }
+        
+        /* Confetti and Party Hats */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            top: -100px;
+            animation: confetti-fall linear infinite;
+        }
+        
+        .confetti:nth-child(2n) { background: #4ecdc4; }
+        .confetti:nth-child(3n) { background: #ffe66d; }
+        .confetti:nth-child(4n) { background: #ff6b9d; }
+        .confetti:nth-child(5n) { background: #95e1d3; }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .party-hat {
+            position: absolute;
+            font-size: 30px;
+            top: -100px;
+            animation: hat-fall linear infinite;
+        }
+        
+        @keyframes hat-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Button */
+        .letter-button {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 100;
+            transition: all 0.3s ease;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .letter-button:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .letter-button:active {
+            transform: translateX(-50%) scale(0.98);
+        }
+        
+        /* Letter Modal */
+        .letter-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .letter-overlay.show {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .letter-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: letterFloatIn 0.6s ease-out;
+            margin: 20px;
+        }
+        
+        @keyframes letterFloatIn {
+            0% {
+                transform: translateY(-100px) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .letter-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .letter-close:hover {
+            background: #ff5252;
+            transform: rotate(90deg);
+        }
+        
+        .letter-content {
+            font-family: 'Georgia', serif;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #333;
+            text-align: left;
+        }
+        
+        .letter-content h2 {
+            color: #667eea;
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        /* Header */
+        .birthday-header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            z-index: 100;
+            position: relative;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%);
+        }
+        
+        .birthday-title {
+            font-family: 'Arial', sans-serif;
+            font-size: 42px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 25%, #f8b500 50%, #ff6b9d 75%, #c44569 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+            margin: 0;
+            letter-spacing: 2px;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .birthday-subtitle {
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            color: #ffe66d;
+            margin-top: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        /* Content wrapper */
+        .content-wrapper {
+            min-height: 100vh;
+            padding-top: 0;
+        }
+        
+        /* ASCII Art Container */
+        .ascii-container {
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+        }
+        
+        /* Decorative sparkles */
+        .sparkle {
+            position: absolute;
+            font-size: 20px;
+            animation: sparkle 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1) rotate(180deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .birthday-title {
+                font-size: 28px;
+                padding: 0 10px;
+            }
+            
+            .birthday-subtitle {
+                font-size: 18px;
+            }
+            
+            .birthday-header {
+                padding: 30px 15px 20px;
+            }
+            
+            .letter-button {
+                padding: 12px 30px;
+                font-size: 16px;
+                bottom: 20px;
+            }
+            
+            .letter-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confetti-container" id="confettiContainer"></div>
+    
+    <div class="content-wrapper">
+        <header class="birthday-header">
+            <h1 class="birthday-title">Happy Birthday My Luv2x <3</h1>
+            <div class="birthday-subtitle">🎂 🎉 🎈 🎊 🎁</div>
+        </header>
+        
+        <div class="ascii-container">
+            <div id="loading" class="loading">Converting image to ASCII art...</div>
+            <pre id="asciiOutput"></pre>
+        </div>
+    </div>
+    
+    <button class="letter-button" id="letterButton">💌 Open Letter</button>
+    
+    <div class="letter-overlay" id="letterOverlay">
+        <div class="letter-container">
+            <button class="letter-close" id="letterClose">×</button>
+            <div class="letter-content" id="letterContent">
+                <h2>Happy Birthday! 🎉</h2>
+                <p>Happy happy birthday luv2x 😚💙
+                    I wanna hug you kiss you and hug you and kiss you so much right now 🥺
+                    Thank you so much for coming into my life and letting me in into yours,
+                    I can't put into words how lucky I am to have you in my life  especially as a 'GIRLFRIEND' 🥺🫶
+                    You've become the greatest plot twist I had this year and the greatest gift I had my entire life
+                    Our relationship may not have the greatest starts of all relationships, but I'm gonna make sure that we'll have the brightest future. I can no longer imagine a future without you, that's how much you mean to me.
+                    Too bad I can't be there with you and celebrate this great day, but I wish you to have a really happy birthday and please enjoy your day, cast away everything else that brings negativity just for once. 
+                    I love you so so so so much 💓🥺</p>
+            </div>
+        </div>
+    </div>
+    
+    <canvas id="canvas" style="display: none;"></canvas>
+    <img id="sourceImage" src="public/Jen.jpg" style="display: none;" crossorigin="anonymous">
+
+    <script>
+        // ASCII character set using readable letters, from darkest to lightest
+        const asciiChars = 'MWN@#%&*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,"^`\'. ';
+
+        function imageToASCII(img, width) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Account for character aspect ratio when calculating height
+            // Characters are taller than wide, so we need fewer lines to maintain aspect ratio
+            const charAspectRatio = 0.52; // Character width/height ratio
+            const imgAspectRatio = img.height / img.width;
+            // To maintain image aspect ratio: height/width = imgAspectRatio
+            // But displayed: (height * charHeight) / (width * charWidth) = imgAspectRatio
+            // charWidth = charHeight * charAspectRatio
+            // So: (height * charHeight) / (width * charHeight * charAspectRatio) = imgAspectRatio
+            // height / (width * charAspectRatio) = imgAspectRatio
+            // height = width * charAspectRatio * imgAspectRatio
+            const height = Math.floor(width * charAspectRatio * imgAspectRatio);
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            // Pre-calculate character mapping for performance
+            const charMap = new Array(256);
+            const maxIndex = asciiChars.length - 1;
+            for (let i = 0; i < 256; i++) {
+                const brightness = i / 255;
+                charMap[i] = asciiChars[Math.floor((1 - brightness) * maxIndex)];
+            }
+            
+            // Build HTML with colored spans
+            const lines = new Array(height);
+            for (let y = 0; y < height; y++) {
+                let line = '';
+                const yOffset = y * width;
+                
+                for (let x = 0; x < width; x++) {
+                    const index = (yOffset + x) * 4;
+                    const r = data[index];
+                    const g = data[index + 1];
+                    const b = data[index + 2];
+                    // Fast brightness calculation using integer math
+                    const brightness = Math.floor((r * 76 + g * 150 + b * 29) >> 8);
+                    const char = charMap[brightness];
+                    // Wrap each character in a span with its original color
+                    line += `<span style="color: rgb(${r}, ${g}, ${b});">${char}</span>`;
+                }
+                
+                lines[y] = line;
+            }
+            
+            return lines.join('\n');
+        }
+
+        function calculateOptimalWidth(img) {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const imgAspectRatio = img.height / img.width; // 960/720 = 1.333 for portrait
+            const charAspectRatio = 0.52; // Character width/height ratio
+            
+            // Calculate maximum display dimensions (80% of viewport)
+            const maxDisplayWidth = screenWidth * 0.8;
+            const maxDisplayHeight = screenHeight * 0.8;
+            
+            // Try different character widths to find optimal
+            let bestWidth = 100;
+            let bestScore = 0;
+            
+            for (let testWidth = 80; testWidth <= 300; testWidth += 5) {
+                // Calculate how many lines we'll have
+                const testHeight = Math.floor(testWidth * charAspectRatio * imgAspectRatio);
+                
+                // Calculate what font size would be needed for width constraint
+                const fontSizeForWidth = maxDisplayWidth / testWidth;
+                
+                // Calculate what font size would be needed for height constraint
+                const fontSizeForHeight = maxDisplayHeight / testHeight;
+                
+                // Use the smaller font size (the limiting factor)
+                const fontSize = Math.min(fontSizeForWidth, fontSizeForHeight);
+                
+                // Check if this font size is reasonable
+                if (fontSize >= 3 && fontSize <= 14) {
+                    const score = testWidth * testHeight; // Prefer more detail
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestWidth = testWidth;
+                    }
+                }
+            }
+            
+            return bestWidth;
+        }
+
+        function updateFontSize(asciiWidth, img) {
+            const output = document.getElementById('asciiOutput');
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const imgAspectRatio = img.height / img.width;
+            const charAspectRatio = 0.52; // Character width/height ratio
+            
+            // Calculate actual ASCII height (accounting for character aspect ratio)
+            const asciiHeight = Math.floor(asciiWidth * charAspectRatio * imgAspectRatio);
+            
+            // Calculate font size based on width constraint
+            // displayedWidth = asciiWidth * (fontSize * charAspectRatio)
+            const fontSizeForWidth = (screenWidth * 0.8) / (asciiWidth * charAspectRatio);
+            
+            // Calculate font size based on height constraint
+            // displayedHeight = asciiHeight * fontSize
+            const fontSizeForHeight = (screenHeight * 0.8) / asciiHeight;
+            
+            // Use the smaller font size to ensure it fits
+            let fontSize = Math.min(fontSizeForWidth, fontSizeForHeight);
+            
+            // Clamp to reasonable values
+            fontSize = Math.max(3, Math.min(14, fontSize));
+            
+            output.style.fontSize = fontSize + 'px';
+        }
+
+        function convertImage() {
+            const img = document.getElementById('sourceImage');
+            const output = document.getElementById('asciiOutput');
+            const loading = document.getElementById('loading');
+            
+            if (!img.complete) {
+                img.onload = function() {
+                    generateASCII();
+                };
+                return;
+            }
+            
+            generateASCII();
+            
+            function generateASCII() {
+                const optimalWidth = calculateOptimalWidth(img);
+                const ascii = imageToASCII(img, optimalWidth);
+                output.innerHTML = ascii;
+                loading.style.display = 'none';
+                updateFontSize(optimalWidth, img);
+            }
+        }
+
+        // Handle window resize with debouncing for performance
+        let resizeTimeout;
+        function handleResize() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                const img = document.getElementById('sourceImage');
+                if (img.complete) {
+                    const loading = document.getElementById('loading');
+                    loading.style.display = 'block';
+                    loading.textContent = 'Regenerating for new size...';
+                    
+                    setTimeout(function() {
+                        convertImage();
+                    }, 100);
+                }
+            }, 250);
+        }
+
+        // Confetti and Party Hats Animation
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff6b9d', '#95e1d3', '#a8e6cf', '#ffd3a5', '#fd79a8'];
+            
+            // Create confetti pieces
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = (Math.random() * 8 + 6) + 'px';
+                confetti.style.height = confetti.style.width;
+                container.appendChild(confetti);
+            }
+            
+            // Create party hats
+            const hatEmojis = ['🎩', '🎊', '🎉', '🎈'];
+            for (let i = 0; i < 20; i++) {
+                const hat = document.createElement('div');
+                hat.className = 'party-hat';
+                hat.textContent = hatEmojis[Math.floor(Math.random() * hatEmojis.length)];
+                hat.style.left = Math.random() * 100 + '%';
+                hat.style.animationDuration = (Math.random() * 4 + 3) + 's';
+                hat.style.animationDelay = Math.random() * 2 + 's';
+                hat.style.fontSize = (Math.random() * 20 + 25) + 'px';
+                container.appendChild(hat);
+            }
+        }
+        
+        // Create sparkles around header
+        function createSparkles() {
+            const header = document.querySelector('.birthday-header');
+            if (!header) return;
+            
+            const sparkleEmojis = ['✨', '⭐', '💫', '🌟'];
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                sparkle.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+                header.style.position = 'relative';
+                header.appendChild(sparkle);
+            }
+        }
+        
+        // Letter Modal Functions
+        function openLetter() {
+            const overlay = document.getElementById('letterOverlay');
+            overlay.classList.add('show');
+        }
+        
+        function closeLetter() {
+            const overlay = document.getElementById('letterOverlay');
+            overlay.classList.remove('show');
+        }
+        
+        // Event Listeners
+        document.getElementById('letterButton').addEventListener('click', openLetter);
+        document.getElementById('letterClose').addEventListener('click', closeLetter);
+        document.getElementById('letterOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLetter();
+            }
+        });
+        
+        // Start conversion and animations when page loads
+        window.addEventListener('load', function() {
+            convertImage();
+            createConfetti();
+            createSparkles();
+        });
+        window.addEventListener('resize', handleResize);
+    </script>
+</body>
+</html>
