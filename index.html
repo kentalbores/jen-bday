@@ -348,6 +348,9 @@
     
     <canvas id="canvas" style="display: none;"></canvas>
     <img id="sourceImage" src="public/Jen.jpg" style="display: none;" crossorigin="anonymous">
+    <audio id="birthdaySong" preload="auto">
+        <source src="public/song1.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         // ASCII character set using readable letters, from darkest to lightest
@@ -571,11 +574,23 @@
         function openLetter() {
             const overlay = document.getElementById('letterOverlay');
             overlay.classList.add('show');
+            
+            // Play the birthday song
+            const audio = document.getElementById('birthdaySong');
+            audio.play().catch(function(error) {
+                // Handle autoplay restrictions - user interaction is required
+                console.log('Audio play failed:', error);
+            });
         }
         
         function closeLetter() {
             const overlay = document.getElementById('letterOverlay');
             overlay.classList.remove('show');
+            
+            // Pause the birthday song
+            const audio = document.getElementById('birthdaySong');
+            audio.pause();
+            audio.currentTime = 0; // Reset to beginning for next time
         }
         
         // Event Listeners
